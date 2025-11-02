@@ -26,12 +26,56 @@ node-create-guidelines/
 └── examples/                # Sample flows (JSON)  
 ```
 
+## ⚠️ Critical Information for Node-RED MCU
+
+**If you're creating MCU-specific nodes, pay special attention to:**
+
+1. **Dual Implementation Required**:
+   - `<node-name>.js`: Stub for standard Node-RED (CommonJS only, no ESM)
+   - `<node-name>.mcu.js`: Actual MCU implementation (ESM, runs on Moddable)
+
+2. **manifest.json Must Use Object Format**:
+   ```json
+   {
+     "modules": {
+       "node-name": "./node/node-name/node-name.mcu"
+     },
+     "preload": "node-name"
+   }
+   ```
+   ⚠️ Do NOT use array format or include `.js` extension!
+
+3. **NO `export default` in MCU Implementation**:
+   ```javascript
+   // ❌ WRONG
+   export default class MyNode extends Node { }
+   
+   // ✅ CORRECT
+   class MyNode extends Node {
+     static type = "my-node"
+     static { RED.nodes.registerType(this.type, this) }
+   }
+   ```
+
+4. **package.json Points to Stub Only**:
+   ```json
+   {
+     "node-red": {
+       "nodes": {
+         "my-node": "node/my-node/my-node.js"
+       }
+     }
+   }
+   ```
+
+See `docs/node-definition.md` for complete MCU-specific guidelines.
+
 ## Documentation
 
 For more detailed information, please refer to the `docs/` folder, which includes:
 
-- `folder-structure.md`: Details on the recommended project structure.
-- `node-definition.md`: Guidelines for defining Node-RED nodes.
+- `folder-structure.md`: Details on the recommended project structure (including MCU dual-file pattern).
+- `node-definition.md`: Guidelines for defining Node-RED nodes (includes critical MCU requirements).
 - `publishing.md`: Steps for publishing to NPM and updating versions.
 
 ## Adding This Project as a Git Submodule

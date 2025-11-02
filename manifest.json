@@ -1,6 +1,6 @@
 {
-    "modules": [
-        "example-node/example-node.js"
-    ],
-    "preload": []
+    "modules": {
+        "example-node": "./node/example-node/example-node.mcu"
+    },
+    "preload": "example-node"
 }
